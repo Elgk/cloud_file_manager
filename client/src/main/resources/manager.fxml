@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.Controller">
+<HBox>
+    <Pane minHeight="25" HBox.hgrow="ALWAYS">
+        <Label  layoutX="359.0" layoutY="5.0" text=" Server " />
+        <Button fx:id="btnLogIn"  layoutX="406.0" layoutY="1.0" minWidth="100" onAction="#showRegWindow" text="Log In" />
+    </Pane>
+</HBox>
+
+    <HBox VBox.vgrow="ALWAYS">
+        <VBox fx:id="ClientPanel" HBox.hgrow="ALWAYS">
+            <HBox minWidth="200" VBox.vgrow="ALWAYS">
+                <TextField fx:id="clientPath" editable="false" focusTraversable="false" minWidth="250" />
+                <Button onAction="#clientUp" text="Up" HBox.hgrow="ALWAYS" />
+            </HBox>
+<!--            <TextField fx:id="textFieldSever" editable="false" focusTraversable="false" minWidth="100" prefHeight="26.0" prefWidth="166.0" />-->
+            <ListView fx:id="clientList" minWidth="200" VBox.vgrow="ALWAYS" />
+            <TextField fx:id="clientInfo" focusTraversable="false" minWidth="100" />
+        </VBox>
+        <Pane minWidth="60" prefHeight="451.0" prefWidth="70.0" HBox.hgrow="ALWAYS">
+            <Button layoutX="5.0" layoutY="160.0" onAction="#downLoad" text="toClient" />
+            <Button layoutX="5.0" layoutY="260.0" onAction="#upLoad" text="toServer" />
+        </Pane>
+
+        <VBox fx:id="serverPanel" HBox.hgrow="ALWAYS">
+            <HBox VBox.vgrow="ALWAYS">
+                <TextField fx:id="serverPath" editable="false" focusTraversable="false" minWidth="250" />
+                <Button fx:id="btnServerUp" text="Up" onAction="#serverUp" HBox.hgrow="ALWAYS" />
+            </HBox>
+<!--            <TextField fx:id="textFieldClient" editable="false" focusTraversable="false" minWidth="100" />-->
+            <ListView fx:id="serverList"  minWidth="200" VBox.vgrow="ALWAYS" />
+            <TextField fx:id="serverInfo" minWidth="200" />
+        </VBox>
+
+<!--        <TextArea fx:id="textArea"  HBox.hgrow="ALWAYS" />-->
+    </HBox>
+    <HBox>
+        <Button maxWidth="Infinity" text="Upload" onAction="#upLoad" HBox.hgrow="ALWAYS" />
+        <Button maxWidth="Infinity" text="Download" onAction="#downLoad" HBox.hgrow="ALWAYS" />
+    </HBox>
+</VBox>
