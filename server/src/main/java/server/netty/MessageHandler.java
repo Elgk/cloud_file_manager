@@ -8,14 +8,18 @@ import model.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class MessageHandler extends SimpleChannelInboundHandler<AbstractCommand> {
+    private static final String ROOT_PATH = "server_dir";
     private Path currentPath;
     private String authResultMessage;
+    private List<String> userFolders = new ArrayList<>();
 
     public MessageHandler() throws IOException {
-        currentPath = Path.of("server_dir");
+        currentPath = Path.of(ROOT_PATH);
         if (!Files.exists(currentPath)){
             Files.createDirectory(currentPath);
         }
@@ -52,11 +56,21 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractCommand>
                 break;
             case PATH_IN_REQUEST:
                 PathInRequest request = (PathInRequest) command;
-                Path newPath = currentPath.resolve(request.getDir());
-                if (Files.isDirectory(newPath)){
-                    currentPath = newPath;
-                    ctx.writeAndFlush(new PathUpResponse(currentPath.toString()));
-                    ctx.writeAndFlush(new ListResponse(currentPath));
+                if (checkAccessFolder(request.getDir())){
+                    Path newPath = currentPath.resolve(request.getDir());
+                    if (Files.isDirectory(newPath)){
+                        currentPath = newPath;
+                        ctx.writeAndFlush(new PathUpResponse(currentPath.toString()));
+                        ctx.writeAndFlush(new ListResponse(currentPath));
+                    }
+                }
+                break;
+            case FILE_DELETE:
+                DeleteRequest deleteFile = (DeleteRequest) command;
+                Path deletePath = currentPath.resolve(deleteFile.getFileName());
+                if (Files.exists(deletePath)){
+                    Files.delete(deletePath);
+                    ctx.writeAndFlush( new ListResponse(currentPath));
                 }
                 break;
             case AUTH_REQUEST:
@@ -76,12 +90,12 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractCommand>
     private boolean authResult(String login, String password){
         String[] userData = SQLHandler.getNicknameByLoginPassword(login, password);
         if (userData != null) {
-            String userFolder = SQLHandler.getUserFolder(currentPath.toString(), userData[1] );
+            userFolders = SQLHandler.getUserFolder(currentPath.toString(), userData[1] );
             String nickName =  userData[0];
-            if (userFolder != null){
+            if (!userFolders.isEmpty()){
               //  currentPath = Path.of(userFolder);
-                currentPath = currentPath.resolve(userFolder);
-                authResultMessage = userData[0];
+                currentPath = currentPath.resolve(userFolders.get(0));
+                authResultMessage = nickName;
                 return true;
             }
             authResultMessage = "No access";
@@ -90,5 +104,13 @@ public class MessageHandler extends SimpleChannelInboundHandler<AbstractCommand>
             authResultMessage = "Entered login or password is not correct";
             return false;
         }
+    }
+    private boolean checkAccessFolder(String dir){
+        //если папка в корневом пути, то проверяем доступ
+        // если нет, то считаем что эта папка принадлежит  уже проверенной на доступ папке и все, что внутри доступно
+        if (currentPath.equals(Path.of(ROOT_PATH))){
+            return userFolders.contains(dir);
+        }
+       return  true;
     }
 }

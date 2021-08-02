@@ -1,13 +1,14 @@
 package server.netty;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLHandler {
     private static Connection connection;
     private static PreparedStatement resultSet;
     private static PreparedStatement usersSet;
     private static PreparedStatement foldersSet;
-    private static PreparedStatement resultFoldersSet;
 
     public static boolean connect()  {
         try {
@@ -23,7 +24,6 @@ public class SQLHandler {
 
     public static void disconnect() throws SQLException {
         resultSet.close();
-        resultFoldersSet.close();
         usersSet.close();
         foldersSet.close();
         connection.close();
@@ -33,9 +33,7 @@ public class SQLHandler {
         try {
             resultSet = connection.prepareStatement("SELECT nickname FROM users WHERE login = ? AND password = ?;");
             usersSet = connection.prepareStatement("SELECT nickname, id FROM users WHERE login = ? AND password = ?; ");
-            foldersSet = connection.prepareStatement("SELECT name FROM network_folders WHERE server_name = ? AND user_id = ?");
-            resultFoldersSet = connection.prepareStatement("SELECT name FROM network_folders WHERE server_name = ? AND user_id = ?");
-
+            foldersSet = connection.prepareStatement("SELECT name FROM network_folders WHERE server_name = ? AND user_id = ? order by name");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -62,19 +60,19 @@ public class SQLHandler {
             }
 
     }
-    public static String getUserFolder(String server_name, String user_id){
-
+    public static List<String> getUserFolder(String server_name, String user_id){
+        List<String> folderList = new ArrayList<>();
         try {
             foldersSet.setString(1, server_name);
             foldersSet.setString(2, user_id);
             ResultSet rs = foldersSet.executeQuery();
             while (rs.next()){
-               return rs.getString(1);
+                folderList.add(rs.getString(1));
             }
-            return null;
+            return folderList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            return null;
+            return folderList;
         }
     }
 
