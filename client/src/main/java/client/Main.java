@@ -13,7 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/manager.fxml"));
-        primaryStage.setScene(new Scene(root, 650, 400));
+        primaryStage.setScene(new Scene(root, 700, 600));
         primaryStage.setTitle("Network Storage Manager");
         primaryStage.show();
     }

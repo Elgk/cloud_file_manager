@@ -4,6 +4,7 @@ public enum CommandType {
     PATH_RESPONSE,
     FILE_MESSAGE,
     FILE_REQUEST,
+    FILE_DELETE,
     LIST_REQUEST,
     PATH_UP,
     PATH_IN_REQUEST,

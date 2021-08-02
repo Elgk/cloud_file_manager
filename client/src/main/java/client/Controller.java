@@ -9,9 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -234,4 +232,15 @@ public class Controller implements Initializable {
         });
     }
 
+    public void deleteFile(ActionEvent actionEvent) throws IOException {
+
+      if (serverList.getSelectionModel().getSelectedItems().isEmpty()) {
+          Alert alert = new Alert(Alert.AlertType.WARNING, "No file is selected.", ButtonType.OK);
+          alert.showAndWait();
+      }else{
+          String name = serverList.getSelectionModel().getSelectedItem();
+          out.writeObject(new DeleteRequest(name));
+          out.flush();
+      }
+    }
 }
